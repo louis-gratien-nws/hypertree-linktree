@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HyperTree - Linktree Advanced Clone</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              space: ['"Space Grotesk"', "sans-serif"],
+              sora: ["Sora", "sans-serif"],
+              mono: ['"IBM Plex Mono"', "monospace"],
+              display: ['"Bebas Neue"', "cursive"]
+            }
+          }
+        }
+      };
+    </script>
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&family=Bebas+Neue&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+    />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body class="font-space min-h-screen antialiased" data-app-mode="public">
+    <div id="bg-gradient" class="bg-layer"></div>
+    <canvas id="bg-particles" class="bg-layer hidden"></canvas>
+    <div id="bg-aurora" class="bg-layer hidden"></div>
+    <div id="bg-image" class="bg-layer hidden"></div>
+    <video id="bg-video" class="bg-layer hidden" autoplay muted loop playsinline crossorigin="anonymous"></video>
+    <div id="bg-youtube" class="bg-layer hidden">
+      <iframe
+        id="bg-youtube-frame"
+        title="Background YouTube"
+        src=""
+        allow="autoplay; encrypted-media; picture-in-picture"
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
+    </div>
+    <div id="bg-waves" class="bg-layer hidden"></div>
+    <div id="bg-overlay" class="bg-layer"></div>
+
+    <div id="page-shell" class="relative z-10 min-h-screen w-full px-4 py-8 sm:py-10">
+      <header class="mx-auto flex max-w-5xl items-center justify-between">
+        <h1 class="text-lg font-semibold tracking-wide">HyperTree</h1>
+        <div class="flex items-center gap-2">
+          <button
+            id="go-login"
+            class="btn-action rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur"
+          >
+            <i class="ri-lock-2-line mr-1"></i> Connexion Dashboard
+          >
+          </button>
+        </div>
+      </header>
+
+      <main class="mx-auto mt-6 grid max-w-5xl gap-6 md:grid-cols-[1fr_360px]">
+        <section>
+          <article id="profile-card" class="profile-card rounded-3xl p-6 shadow-2xl">
+            <div class="mx-auto h-24 w-24 overflow-hidden rounded-full border-4 border-white/30 shadow-xl">
+              <img id="profile-avatar" src="" alt="Photo de profil" class="h-full w-full object-cover" />
+            </div>
+            <div class="mt-4 text-center">
+              <h2 id="profile-name" class="text-2xl font-bold"></h2>
+              <p id="profile-bio" class="mt-2 text-sm opacity-80"></p>
+            </div>
+            <div id="social-icons" class="mt-4 flex justify-center gap-3"></div>
+          </article>
+
+          <section class="mt-6" aria-label="Liens">
+            <div id="links-container" class="link-stack"></div>
+          </section>
+
+          <section class="mt-6" aria-label="Widgets">
+            <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.2em] opacity-70">Widgets</h3>
+            <div id="widgets-container" class="grid gap-3 sm:grid-cols-2"></div>
+          </section>
+        </section>
+
+        <aside
+          id="editor-panel"
+          class="editor-panel rounded-3xl border border-white/20 bg-black/25 p-4 backdrop-blur-xl"
+        >
+          <div class="mb-3 flex items-center justify-between">
+            <h3 class="text-lg font-semibold">Dashboard Edition</h3>
+            <button id="close-editor" class="btn-action rounded-lg px-2 py-1 text-sm md:hidden">
+              <i class="ri-close-line"></i>
+            </button>
+          </div>
+
+          <div class="custom-scroll max-h-[75vh] space-y-5 overflow-y-auto pr-1">
+            <section class="space-y-3 rounded-2xl border border-white/15 bg-black/20 p-3">
+              <h4 class="font-medium">Profil</h4>
+              <div class="grid gap-2">
+                <input id="input-name" class="field" type="text" placeholder="Nom" />
+                <textarea id="input-bio" class="field" rows="2" placeholder="Bio"></textarea>
+                <input id="input-avatar" class="field" type="url" placeholder="URL avatar" />
+                <label class="flex items-center gap-2 text-sm">
+                  <input id="input-verified" type="checkbox" /> Badge vérifié
+                </label>
+              </div>
+            </section>
+
+            <section class="space-y-3 rounded-2xl border border-white/15 bg-black/20 p-3">
+              <h4 class="font-medium">Liens</h4>
+              <form id="link-form" class="grid gap-2">
+                <input id="link-title" class="field" type="text" placeholder="Titre du lien" required />
+                <input id="link-url" class="field" type="url" placeholder="https://..." required />
+                <input id="link-icon" class="field" type="text" placeholder="Icône (ex: ri-youtube-line)" />
+                <label class="flex items-center gap-2 text-sm">
+                  <input id="link-new-tab" type="checkbox" checked /> Ouvrir dans un nouvel onglet
+                </label>
+                <input id="link-id" type="hidden" />
+                <button class="btn-primary rounded-xl px-3 py-2 text-sm font-semibold" type="submit">
+                  Ajouter / Mettre à jour
+                </button>
+              </form>
+
+              <ul id="link-admin-list" class="space-y-2"></ul>
+            </section>
+
+            <section class="space-y-3 rounded-2xl border border-white/15 bg-black/20 p-3">
+              <h4 class="font-medium">Design</h4>
+              <div class="grid gap-2">
+                <label class="text-sm">Theme preset
+                  <select id="select-theme" class="field">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                    <option value="neon">Neon</option>
+                    <option value="cyberpunk">Cyberpunk</option>
+                    <option value="minimal">Minimal</option>
+                    <option value="glass">Glassmorphism</option>
+                  </select>
+                </label>
+
+                <label class="text-sm">Typographie
+                  <select id="select-font" class="field">
+                    <option value="space">Space Grotesk</option>
+                    <option value="sora">Sora</option>
+                    <option value="mono">IBM Plex Mono</option>
+                    <option value="display">Bebas Neue</option>
+                  </select>
+                </label>
+
+                <label class="text-sm">Style des boutons
+                  <select id="select-button-style" class="field">
+                    <option value="rounded">Arrondis</option>
+                    <option value="square">Carrés</option>
+                    <option value="glass">Glassmorphism</option>
+                  </select>
+                </label>
+
+                <label class="text-sm">Espacement des liens
+                  <input id="input-spacing" class="w-full" type="range" min="8" max="26" step="1" />
+                </label>
+
+                <label class="flex items-center gap-2 text-sm">
+                  <input id="input-animations" type="checkbox" checked /> Animations UI
+                </label>
+
+                <label class="text-sm">Background
+                  <select id="select-background" class="field">
+                    <option value="gradient">Gradient animé</option>
+                    <option value="particles">Particules interactives</option>
+                    <option value="waves">Vagues animées</option>
+                    <option value="aurora">Aurora</option>
+                    <option value="video">Vidéo</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="image">Image + parallaxe</option>
+                  </select>
+                </label>
+
+                <input id="input-bg-image" class="field" type="url" placeholder="URL image background" />
+                <input id="input-bg-video" class="field" type="url" placeholder="URL vidéo background" />
+                <input id="input-bg-youtube" class="field" type="url" placeholder="URL YouTube (watch, youtu.be, embed)" />
+
+                <label class="text-sm">Superposition noire
+                  <input id="input-bg-overlay" class="w-full" type="range" min="0" max="85" step="1" />
+                </label>
+
+                <label class="flex items-center gap-2 text-sm">
+                  <input id="input-adaptive-colors" type="checkbox" checked /> Adapter couleurs a la video/image/gif
+                </label>
+              </div>
+            </section>
+
+            <section class="space-y-3 rounded-2xl border border-white/15 bg-black/20 p-3">
+              <h4 class="font-medium">Widgets</h4>
+              <div class="grid gap-2 text-sm">
+                <label class="flex items-center gap-2"><input id="widget-spotify" type="checkbox" /> Spotify</label>
+                <label class="flex items-center gap-2"><input id="widget-followers" type="checkbox" /> Followers</label>
+                <label class="flex items-center gap-2"><input id="widget-discord" type="checkbox" /> Discord</label>
+                <label class="flex items-center gap-2"><input id="widget-clock" type="checkbox" /> Horloge</label>
+                <label class="flex items-center gap-2"><input id="widget-visits" type="checkbox" /> Compteur de visites</label>
+              </div>
+            </section>
+
+            <section class="space-y-3 rounded-2xl border border-white/15 bg-black/20 p-3">
+              <h4 class="font-medium">Config</h4>
+              <div class="grid gap-2">
+                <button id="btn-export" class="btn-action rounded-xl px-3 py-2 text-sm" type="button">Exporter JSON</button>
+                <label class="btn-action rounded-xl px-3 py-2 text-center text-sm">
+                  Importer JSON
+                  <input id="import-file" type="file" accept="application/json" class="hidden" />
+                </label>
+                <button id="btn-reset" class="rounded-xl bg-red-500/80 px-3 py-2 text-sm font-semibold" type="button">Réinitialiser</button>
+                <div class="rounded-xl border border-white/10 bg-black/20 p-3 text-center">
+                  <p class="mb-2 text-xs uppercase tracking-wider opacity-70">QR Code</p>
+                  <img id="qr-code" alt="QR code" class="mx-auto h-28 w-28 rounded-lg" />
+                </div>
+              </div>
+            </section>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="assets/js/app.js"></script>
+  </body>
+</html>
