@@ -99,7 +99,7 @@ function buildYouTubeEmbedUrl(videoId, startSeconds = 0) {
     return "";
   }
   const start = Math.max(0, Number(startSeconds) || 0);
-  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&showinfo=0&rel=0&start=${start}`;
+  return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&showinfo=0&rel=0&start=${start}`;
 }
 
 function setOverlayOpacity(opacityPercent) {

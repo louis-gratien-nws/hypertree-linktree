@@ -1,4 +1,4 @@
-export const STORAGE_KEY = "hypertree-config-v1";
+export const STORAGE_KEY = "hypertree-config-v2";
 
 export const defaultState = {
   profile: {

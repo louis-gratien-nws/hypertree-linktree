@@ -45,9 +45,16 @@ function renderProfile(state) {
   bioEl.textContent = profile.bio;
 
   const fallbackAvatar = getFallbackAvatarUrl(profile.name);
+  const localAvatar = "assets/images/profile.jpg";
   const proxyAvatar = getProxyAvatarUrl(profile.avatar);
   avatarEl.onerror = null;
   avatarEl.onerror = () => {
+    if (!avatarEl.dataset.localTried) {
+      avatarEl.dataset.localTried = "1";
+      avatarEl.src = localAvatar;
+      return;
+    }
+
     if (!avatarEl.dataset.proxyTried && proxyAvatar) {
       avatarEl.dataset.proxyTried = "1";
       avatarEl.src = proxyAvatar;
@@ -55,6 +62,7 @@ function renderProfile(state) {
     }
     avatarEl.src = fallbackAvatar;
   };
+  avatarEl.dataset.localTried = "";
   avatarEl.dataset.proxyTried = "";
   avatarEl.src = profile.avatar;
 
