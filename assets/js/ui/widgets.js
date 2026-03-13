@@ -1,6 +1,10 @@
 import { escapeHtml, formatNumber } from "../utils/dom.js";
 
-const SPOTIFY_API_URL = "https://hypertree-linktree.vercel.app/api/spotify";
+const SPOTIFY_API_URLS = [
+  "https://hypertree-linktree.vercel.app/api/spotify",
+  "https://hypertree-linktree-ptb06vqj3-louis-gratien-nws-projects.vercel.app/api/spotify",
+  "https://hypertree-linktree-da6m6yn4z-louis-gratien-nws-projects.vercel.app/api/spotify"
+];
 
 let _spotifyCache = null;
 
@@ -39,20 +43,37 @@ function spotifyWidget() {
   `;
 }
 
+function setSpotifyStatus(message) {
+  const el = document.querySelector("[data-spotify-content]");
+  if (!el) return;
+  el.innerHTML = `<p class="text-xs opacity-70">${escapeHtml(message)}</p>`;
+}
+
 export async function startSpotifyPoller(isEnabled) {
   if (!isEnabled) return;
 
   async function poll() {
-    try {
-      const response = await fetch(SPOTIFY_API_URL);
-      if (!response.ok) return;
-      const data = await response.json();
-      _spotifyCache = data;
-      const el = document.querySelector("[data-spotify-content]");
-      if (el) el.innerHTML = renderSpotifyContent(data);
-    } catch {
-      // echec silencieux
+    let lastError = "";
+
+    for (const apiUrl of SPOTIFY_API_URLS) {
+      try {
+        const response = await fetch(apiUrl, { cache: "no-store" });
+        if (!response.ok) {
+          lastError = `API indisponible (${response.status})`;
+          continue;
+        }
+
+        const data = await response.json();
+        _spotifyCache = data;
+        const el = document.querySelector("[data-spotify-content]");
+        if (el) el.innerHTML = renderSpotifyContent(data);
+        return;
+      } catch {
+        lastError = "Connexion API impossible";
+      }
     }
+
+    setSpotifyStatus(lastError || "Spotify indisponible");
   }
 
   await poll();
