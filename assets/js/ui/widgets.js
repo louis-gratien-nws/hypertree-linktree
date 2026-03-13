@@ -1,6 +1,6 @@
 import { escapeHtml, formatNumber } from "../utils/dom.js";
 
-const SPOTIFY_API_URL = "https://hypertree-linktree-da6m6yn4z-louis-gratien-nws-projects.vercel.app/api/spotify";
+const SPOTIFY_API_URL = "https://hypertree-linktree.vercel.app/api/spotify";
 
 let _spotifyCache = null;
 
