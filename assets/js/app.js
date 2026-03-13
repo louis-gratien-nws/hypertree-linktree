@@ -9,7 +9,7 @@ import {
 } from "./storage.js";
 import { renderApp } from "./ui/render.js";
 import { initDashboard } from "./ui/dashboard.js";
-import { updateClockWidget } from "./ui/widgets.js";
+import { updateClockWidget, startSpotifyPoller } from "./ui/widgets.js";
 import { isAuthenticated, logout, requireAuth } from "./auth.js";
 
 let state = getState();
@@ -207,6 +207,7 @@ function init() {
   persistAndRender();
   applyTiltEffect();
   startClockTicker();
+  startSpotifyPoller(state.widgets.spotify);
 }
 
 init();
