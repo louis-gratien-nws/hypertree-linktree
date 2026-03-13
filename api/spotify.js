@@ -1,6 +1,10 @@
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
@@ -40,9 +44,9 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ error: "Failed to refresh access token" });
     }
 
-    // Recuperer la musique en cours
+    // /me/player est souvent plus reactif que /currently-playing
     const nowPlayingResponse = await fetch(
-      "https://api.spotify.com/v1/me/player/currently-playing",
+      "https://api.spotify.com/v1/me/player",
       {
         headers: { Authorization: `Bearer ${tokenData.access_token}` },
       }

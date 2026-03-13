@@ -7,6 +7,7 @@ const SPOTIFY_API_URLS = [
 ];
 
 let _spotifyCache = null;
+let _spotifyProgressTimer = null;
 
 function renderSpotifyContent(data) {
   if (!data || !data.isPlaying) {
@@ -52,12 +53,29 @@ function setSpotifyStatus(message) {
 export async function startSpotifyPoller(isEnabled) {
   if (!isEnabled) return;
 
+  if (!_spotifyProgressTimer) {
+    _spotifyProgressTimer = setInterval(() => {
+      if (!_spotifyCache?.isPlaying || !_spotifyCache?.duration) {
+        return;
+      }
+
+      _spotifyCache.progress = Math.min(
+        (_spotifyCache.progress || 0) + 1000,
+        _spotifyCache.duration
+      );
+
+      const el = document.querySelector("[data-spotify-content]");
+      if (el) el.innerHTML = renderSpotifyContent(_spotifyCache);
+    }, 1000);
+  }
+
   async function poll() {
     let lastError = "";
 
     for (const apiUrl of SPOTIFY_API_URLS) {
       try {
-        const response = await fetch(apiUrl, { cache: "no-store" });
+        const noCacheUrl = `${apiUrl}?t=${Date.now()}`;
+        const response = await fetch(noCacheUrl, { cache: "no-store" });
         if (!response.ok) {
           lastError = `API indisponible (${response.status})`;
           continue;
@@ -77,7 +95,7 @@ export async function startSpotifyPoller(isEnabled) {
   }
 
   await poll();
-  return setInterval(poll, 5_000);
+  return setInterval(poll, 3_000);
 }
 
 function followersWidget(stats) {
