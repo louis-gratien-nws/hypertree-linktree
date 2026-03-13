@@ -3,6 +3,11 @@ import { applyBackground } from "./backgrounds.js";
 import { renderWidgets } from "./widgets.js";
 import { escapeHtml } from "../utils/dom.js";
 
+function getFallbackAvatarUrl(name) {
+  const seed = encodeURIComponent(name || "HyperTree");
+  return `https://api.dicebear.com/9.x/initials/svg?seed=${seed}`;
+}
+
 function applyTheme(customization) {
   const themeVars = themes[customization.theme] || themes.dark;
   Object.entries(themeVars).forEach(([name, value]) => {
@@ -33,6 +38,12 @@ function renderProfile(state) {
     profile.verified ? '<i class="ri-verified-badge-fill text-sky-400"></i>' : ""
   }`;
   bioEl.textContent = profile.bio;
+
+  const fallbackAvatar = getFallbackAvatarUrl(profile.name);
+  avatarEl.onerror = null;
+  avatarEl.onerror = () => {
+    avatarEl.src = fallbackAvatar;
+  };
   avatarEl.src = profile.avatar;
 
   socialEl.innerHTML = profile.socials

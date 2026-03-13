@@ -46,7 +46,7 @@ export const defaultState = {
     buttonStyle: "rounded",
     spacing: 14,
     animations: true,
-    background: "gradient",
+    background: "youtube",
     bgImage:
       "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1920&q=80",
     bgVideo: "https://cdn.coverr.co/videos/coverr-clouds-over-mountains-1579/1080p.mp4",
