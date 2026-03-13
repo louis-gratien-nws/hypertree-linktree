@@ -78,7 +78,11 @@ function renderLinks(state, onLinkClick) {
 
 function renderQrCode() {
   const qr = document.querySelector("#qr-code");
-  const target = encodeURIComponent(window.location.href);
+  const url = new URL(window.location.href);
+  if (url.pathname.endsWith("/dashboard.html") || url.pathname.endsWith("/login.html")) {
+    url.pathname = url.pathname.replace(/\/(dashboard|login)\.html$/, "/index.html");
+  }
+  const target = encodeURIComponent(url.toString());
   qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${target}`;
 }
 

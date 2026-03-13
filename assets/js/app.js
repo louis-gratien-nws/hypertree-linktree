@@ -125,7 +125,7 @@ function initPublicModeUI() {
 }
 
 function initDashboardModeUI() {
-  if (!requireAuth("login.html")) {
+  if (!requireAuth("index.html")) {
     return false;
   }
 
