@@ -77,7 +77,7 @@ export async function startSpotifyPoller(isEnabled) {
   }
 
   await poll();
-  return setInterval(poll, 30_000);
+  return setInterval(poll, 5_000);
 }
 
 function followersWidget(stats) {
