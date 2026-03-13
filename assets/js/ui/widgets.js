@@ -1,17 +1,62 @@
 import { escapeHtml, formatNumber } from "../utils/dom.js";
 
+const SPOTIFY_API_URL = "https://hypertree-linktree-da6m6yn4z-louis-gratien-nws-projects.vercel.app/api/spotify";
+
+let _spotifyCache = null;
+
+function renderSpotifyContent(data) {
+  if (!data || !data.isPlaying) {
+    return `<p class="text-xs opacity-50">Rien en cours de lecture</p>`;
+  }
+  const pct = Math.round((data.progress / data.duration) * 100);
+  return `
+    <a href="${escapeHtml(data.songUrl)}" target="_blank" rel="noreferrer"
+       class="flex items-center gap-3">
+      <img src="${escapeHtml(data.albumArt || '')}" alt=""
+           class="w-12 h-12 rounded object-cover shrink-0" />
+      <div class="min-w-0 flex-1">
+        <p class="font-semibold text-sm truncate">${escapeHtml(data.title)}</p>
+        <p class="text-xs opacity-70 truncate">${escapeHtml(data.artist)}</p>
+        <div class="mt-1 h-1 rounded-full bg-white/20 overflow-hidden">
+          <div class="h-full rounded-full bg-[#1DB954]" style="width:${pct}%"></div>
+        </div>
+      </div>
+      <i class="ri-spotify-fill text-[#1DB954] text-xl shrink-0"></i>
+    </a>
+  `;
+}
+
 function spotifyWidget() {
   return `
-    <article class="widget-card">
+    <article class="widget-card" data-widget="spotify">
       <p class="text-xs uppercase tracking-widest opacity-70">Spotify</p>
-      <iframe
-        class="mt-2 h-[80px] w-full rounded-lg"
-        src="https://open.spotify.com/embed/track/2takcwOaAZWiXQijPHIx7B"
-        loading="lazy"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      ></iframe>
+      <div class="mt-2" data-spotify-content>
+        ${_spotifyCache
+          ? renderSpotifyContent(_spotifyCache)
+          : '<p class="text-xs opacity-50 animate-pulse">Chargement...</p>'}
+      </div>
     </article>
   `;
+}
+
+export async function startSpotifyPoller(isEnabled) {
+  if (!isEnabled) return;
+
+  async function poll() {
+    try {
+      const response = await fetch(SPOTIFY_API_URL);
+      if (!response.ok) return;
+      const data = await response.json();
+      _spotifyCache = data;
+      const el = document.querySelector("[data-spotify-content]");
+      if (el) el.innerHTML = renderSpotifyContent(data);
+    } catch {
+      // echec silencieux
+    }
+  }
+
+  await poll();
+  return setInterval(poll, 30_000);
 }
 
 function followersWidget(stats) {
