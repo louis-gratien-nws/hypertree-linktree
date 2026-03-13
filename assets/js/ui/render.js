@@ -8,6 +8,11 @@ function getFallbackAvatarUrl(name) {
   return `https://api.dicebear.com/9.x/initials/svg?seed=${seed}`;
 }
 
+function getProxyAvatarUrl(sourceUrl) {
+  if (!sourceUrl) return "";
+  return `https://wsrv.nl/?url=${encodeURIComponent(sourceUrl)}&w=256&h=256&fit=cover`;
+}
+
 function applyTheme(customization) {
   const themeVars = themes[customization.theme] || themes.dark;
   Object.entries(themeVars).forEach(([name, value]) => {
@@ -40,10 +45,17 @@ function renderProfile(state) {
   bioEl.textContent = profile.bio;
 
   const fallbackAvatar = getFallbackAvatarUrl(profile.name);
+  const proxyAvatar = getProxyAvatarUrl(profile.avatar);
   avatarEl.onerror = null;
   avatarEl.onerror = () => {
+    if (!avatarEl.dataset.proxyTried && proxyAvatar) {
+      avatarEl.dataset.proxyTried = "1";
+      avatarEl.src = proxyAvatar;
+      return;
+    }
     avatarEl.src = fallbackAvatar;
   };
+  avatarEl.dataset.proxyTried = "";
   avatarEl.src = profile.avatar;
 
   socialEl.innerHTML = profile.socials

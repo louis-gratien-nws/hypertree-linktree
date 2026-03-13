@@ -66,7 +66,7 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
-function parseYouTubeId(input) {
+function parseYouTubeInput(input) {
   if (!input) {
     return null;
   }
@@ -74,25 +74,32 @@ function parseYouTubeId(input) {
   const value = input.trim();
   const directMatch = value.match(/^[a-zA-Z0-9_-]{11}$/);
   if (directMatch) {
-    return directMatch[0];
+    return { videoId: directMatch[0], startSeconds: 0 };
+  }
+
+  let startSeconds = 0;
+  const startMatch = value.match(/[?&](?:t|start)=([0-9]+)/);
+  if (startMatch) {
+    startSeconds = Number(startMatch[1]) || 0;
   }
 
   const patterns = [/youtu\.be\/([a-zA-Z0-9_-]{11})/, /[?&]v=([a-zA-Z0-9_-]{11})/, /embed\/([a-zA-Z0-9_-]{11})/];
   for (const pattern of patterns) {
     const match = value.match(pattern);
     if (match) {
-      return match[1];
+      return { videoId: match[1], startSeconds };
     }
   }
 
   return null;
 }
 
-function buildYouTubeEmbedUrl(videoId) {
+function buildYouTubeEmbedUrl(videoId, startSeconds = 0) {
   if (!videoId) {
     return "";
   }
-  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&showinfo=0&rel=0`;
+  const start = Math.max(0, Number(startSeconds) || 0);
+  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&showinfo=0&rel=0&start=${start}`;
 }
 
 function setOverlayOpacity(opacityPercent) {
@@ -396,8 +403,9 @@ export function applyBackground(config) {
 
   if (config.background === "youtube") {
     backgroundEls.youtube.classList.remove("hidden");
-    const videoId = parseYouTubeId(config.bgYouTube);
-    const embedUrl = buildYouTubeEmbedUrl(videoId);
+    const youtubeInput = parseYouTubeInput(config.bgYouTube);
+    const videoId = youtubeInput?.videoId || null;
+    const embedUrl = buildYouTubeEmbedUrl(videoId, youtubeInput?.startSeconds || 0);
     if (embedUrl && backgroundEls.youtubeFrame.dataset.src !== embedUrl) {
       backgroundEls.youtubeFrame.src = embedUrl;
       backgroundEls.youtubeFrame.dataset.src = embedUrl;
