@@ -5,7 +5,7 @@ export const defaultState = {
     name: "Louis Studio",
     bio: "Design, code et vibes visuelles. Bienvenue dans mon hub.",
     avatar:
-      "https://images.unsplash.com/photo-1542204625-de293a06df41?auto=format&fit=crop&w=400&q=80",
+      "https://i.scdn.co/image/ab6775700000ee8571b30e0567812487d823e94e",
     verified: true,
     socials: [
       { icon: "ri-instagram-line", url: "https://instagram.com" },
@@ -50,7 +50,7 @@ export const defaultState = {
     bgImage:
       "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1920&q=80",
     bgVideo: "https://cdn.coverr.co/videos/coverr-clouds-over-mountains-1579/1080p.mp4",
-    bgYouTube: "https://www.youtube.com/watch?v=ScMzIvxBSi4",
+    bgYouTube: "https://www.youtube.com/watch?v=zhDwjnYZiCo&t=1218s",
     overlayOpacity: 45,
     adaptiveColors: true
   },
